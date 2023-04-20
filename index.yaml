@@ -1,0 +1,15 @@
+apiVersion: v1
+entries:
+  hoppscotch:
+  - apiVersion: v2
+    appVersion: 2023.4.0
+    created: "2023-04-20T11:13:57.273189363Z"
+    description: Hoppscotch is a light-weight, web based API development suite.
+    digest: 9d0f4d034a71705c1628f55ee89d1bfc961261e087cc74ba1b7208e9caeeb8cc
+    home: https://hoppscotch.io
+    name: hoppscotch
+    type: application
+    urls:
+    - https://github.com/WDaan/hoppscotch-helm/releases/download/hoppscotch-0.0.0/hoppscotch-0.0.0.tgz
+    version: 0.0.0
+generated: "2023-04-20T11:13:57.273194463Z"

@@ -1,0 +1,40 @@
+{{- if .Values.web.autoscaling.enabled }}
+apiVersion: {{ include "hoppscotch.apiVersion.autoscaling" . }}
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "hoppscotch.fullname" (dict "context" . "name" .Values.web.name) }}
+  labels:
+    {{- include "hoppscotch.labels" (dict "context" . "name" .Values.web.name) | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "hoppscotch.fullname" (dict "context" . "name" .Values.web.name)  }}
+  minReplicas: {{ .Values.web.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.web.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.web.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        {{- if eq (include "hoppscotch.apiVersion.autoscaling" $) "autoscaling/v2beta1" }}
+        targetAverageUtilization: {{ .Values.web.autoscaling.targetCPUUtilizationPercentage }}
+        {{- else }}
+        target:
+          type: Utilization 
+          averageUtilization: {{ .Values.web.autoscaling.targetCPUUtilizationPercentage }}
+        {{- end  }}
+    {{- end }}
+    {{- if .Values.web.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        {{- if eq (include "hoppscotch.apiVersion.autoscaling" $) "autoscaling/v2beta1" }}
+        targetAverageUtilization: {{ .Values.web.autoscaling.targetCPUUtilizationPercentage }}
+        {{- else }}
+        target:
+          type: Utilization 
+          averageUtilization: {{ .Values.web.autoscaling.targetMemoryUtilizationPercentage }}
+        {{- end  }}
+    {{- end }}
+{{- end }}

@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "backend.fullname" . }}
+  labels:
+    {{- include "hoppscotch.labels" (dict "context" . "component" .Values.backend.name "name" .Values.backend.name) | nindent 4 }}
+{{- if .Values.backend.service.annotations }}
+  annotations:
+  {{- range $key, $value := .Values.backend.service.annotations }}
+    {{ $key }}: {{ $value | quote }}
+  {{- end }}
+{{- end }}
+spec:
+  {{- if (or (eq .Values.backend.service.type "ClusterIP") (empty .Values.backend.service.type)) }}
+  type: ClusterIP
+  {{- with .Values.backend.service.clusterIP }}
+  clusterIP: {{ . }}
+  {{- end }}
+  {{- else if eq .Values.backend.service.type "LoadBalancer" }}
+  type: {{ .Values.backend.service.type }}
+  {{- with .Values.backend.service.loadBalancerIP }}
+  loadBalancerIP: {{ . }}
+  {{- end }}
+  {{- with .Values.backend.service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- else }}
+  type: {{ .Values.backend.service.type }}
+  {{- end }}
+  {{- with .Values.backend.service.externalIPs }}
+  externalIPs:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  ports:
+    - port: {{ .Values.backend.service.servicePortHttp }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "hoppscotch.selectorLabels"  (dict "context" . "name" .Values.backend.name)  | nindent 4 }}

@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "admin.fullname" . }}
+  labels:
+    {{- include "hoppscotch.labels" (dict "context" .  "name" .Values.admin.name) | nindent 4 }}
+  {{- with .Values.admin.deploymentAnnotations }}
+  annotations:
+    {{- range $key, $value := . }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  {{- end }}
+spec:
+  {{- if not .Values.admin.autoscaling.enabled }}
+  replicas: {{ .Values.admin.replicas }}
+  {{- end }}
+  revisionHistoryLimit: {{ .Values.global.revisionHistoryLimit }}
+  selector:
+    matchLabels:
+      {{- include "hoppscotch.selectorLabels" (dict "context" . "name" .Values.admin.name)  | nindent 6 }}
+  template:
+    metadata:
+      annotations: {{- include "common.classes.podAnnotations" . | nindent 8 }}
+      labels:
+        {{- include "hoppscotch.labels" (dict "context" . "name" .Values.admin.name) | nindent 8 }}
+        {{- with .Values.admin.podLabels }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "hoppscotch.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.global.securityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.admin.securityContext | nindent 12 }}
+          image: "{{ .Values.admin.image.repository }}:{{ .Values.admin.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.admin.image.imagePullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.admin.containerPorts.server }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 3
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

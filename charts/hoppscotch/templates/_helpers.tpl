@@ -77,7 +77,6 @@ Pod annotations
   {{- if .Values.podAnnotations -}}
     {{- tpl (toYaml .Values.podAnnotations) . | nindent 0 -}}
   {{- end -}}
-  {{- printf "checksum/config: %v" (join "," .Values.hoppscotch | sha256sum) | nindent 0 -}}
 {{- end -}}
 
 {{/* Return the target Kubernetes version */}}

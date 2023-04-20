@@ -9,7 +9,7 @@ permissions:
   packages: write
 
 jobs:
-  build-and-push-container:
+  build-and-push-containers:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -45,13 +45,13 @@ jobs:
           push: true
           tags: ghcr.io/wdaan/hoppscotch-backend:${{ steps.fetch_tag.outputs.tag }}
 
-      - name: Build and publish Docker image (App)
+      - name: Build and publish Docker image (web)
         uses: docker/build-push-action@v4
         with:
           file: packages/hoppscotch-selfhost-web/Dockerfile
           context: .
           push: true
-          tags: ghcr.io/wdaan/hoppscotch-app:${{ steps.fetch_tag.outputs.tag }}
+          tags: ghcr.io/wdaan/hoppscotch-web:${{ steps.fetch_tag.outputs.tag }}
       
       - name: Build and publish Docker image (Admin)
         uses: docker/build-push-action@v4
@@ -63,6 +63,7 @@ jobs:
 
   # update-chart-versions:
   #   runs-on: ubuntu-latest
+  #   needs: [build-and-push-containers]
   #   steps:
   #     - name: Checkout
   #       uses: actions/checkout@v3

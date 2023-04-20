@@ -615,7 +615,39 @@ backend:
   extraArgs: []
 
   # -- Environment variables to pass to Hoppscotch web
-  env: []
+  env:
+    # DATABASE_URL: postgresql://postgres:testpass@hoppscotch-db:5432/hoppscotch # or replace with your database URL 
+    # # Auth Tokens Config
+    # JWT_SECRET: "secretcode123"
+    # TOKEN_SALT_COMPLEXITY: 10
+    # MAGIC_LINK_TOKEN_VALIDITY:  3
+    # REFRESH_TOKEN_VALIDITY: "604800000" # Default validity is 7 days (604800000 ms) in ms
+    # ACCESS_TOKEN_VALIDITY: "86400000" # Default validity is 1 day (86400000 ms) in ms
+    # SESSION_SECRET: 'anothersecretcode123'
+    # # Hoppscotch App Domain Config
+    # REDIRECT_URL: "http://localhost:3000"
+    # WHITELISTED_ORIGINS :  "http://localhost:3170,http://localhost:3000,http://localhost:3100"
+    # # Google Auth Config
+    # GOOGLE_CLIENT_ID: "*****"
+    # GOOGLE_CLIENT_SECRET: "*****"
+    # GOOGLE_CALLBACK_URL: "http://localhost:3170/v1/auth/google/callback"
+    # GOOGLE_SCOPE: "email,profile"
+    # # Github Auth Config
+    # GITHUB_CLIENT_ID: "*****"
+    # GITHUB_CLIENT_SECRET: "*****"
+    # GITHUB_CALLBACK_URL: "http://localhost:3170/v1/auth/github/callback"
+    # GITHUB_SCOPE: "user:email"
+    # # Microsoft Auth Config
+    # MICROSOFT_CLIENT_ID: "*****"
+    # MICROSOFT_CLIENT_SECRET: "*****"
+    # MICROSOFT_CALLBACK_URL: "http://localhost:3170/v1/auth/microsoft/callback"
+    # MICROSOFT_SCOPE: "user.read"
+    # # Mailer config
+    # MAILER_SMTP_URL: "smtps://user@domain.com:pass@smtp.domain.com"
+    # MAILER_ADDRESS_FROM: '"From Name Here" <from@example.com>'
+    # Rate Limit Config
+    RATE_LIMIT_TTL: 60 # In seconds
+    RATE_LIMIT_MAX: 100 # Max requests per IP
 
   # -- envFrom to pass to Hoppscotch web
   # @default -- `[]` (See [values.yaml])

@@ -37,22 +37,23 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           file: packages/hoppscotch-selfhost-web/Dockerfile
+          context: .
           push: true
           tags: ghcr.io/wdaan/app:${{ steps.fetch_tag.outputs.tag }}
       
-      - name: Build and publish Docker image (Admin)
-        uses: docker/build-push-action@v4
-        with:
-          file: packages/hoppscotch-sh-admin/Dockerfile
-          push: true
-          tags: ghcr.io/wdaan/admin:${{ steps.fetch_tag.outputs.tag }}
+      # - name: Build and publish Docker image (Admin)
+      #   uses: docker/build-push-action@v4
+      #   with:
+      #     file: packages/hoppscotch-sh-admin/Dockerfile
+      #     push: true
+      #     tags: ghcr.io/wdaan/admin:${{ steps.fetch_tag.outputs.tag }}
       
-      - name: Build and publish Docker image (Backend)
-        uses: docker/build-push-action@v4
-        with:
-          file: packages/hoppscotch-backend/Dockerfile
-          push: true
-          tags: ghcr.io/wdaan/app:${{ steps.fetch_tag.outputs.tag }}
+      # - name: Build and publish Docker image (Backend)
+      #   uses: docker/build-push-action@v4
+      #   with:
+      #     file: packages/hoppscotch-backend/Dockerfile
+      #     push: true
+      #     tags: ghcr.io/wdaan/app:${{ steps.fetch_tag.outputs.tag }}
 
 
   # update-chart-versions:

@@ -26,6 +26,9 @@ jobs:
           tag=$(gh release view -R hoppscotch/hoppscotch --json tagName | jq -r .tagName)
           echo "tag=${tag}" >> $GITHUB_OUTPUT
 
+      - name: cp .env
+        run: cp .env.example .env
+
       - name: Log in to the Container registry
         uses: docker/login-action@v2
         with:
@@ -38,23 +41,25 @@ jobs:
         with:
           file: packages/hoppscotch-selfhost-web/Dockerfile
           context: .
+          target: prod
           push: true
-          tags: ghcr.io/wdaan/app:${{ steps.fetch_tag.outputs.tag }}
+          tags: ghcr.io/wdaan/hoppscotch-app:${{ steps.fetch_tag.outputs.tag }}
       
       # - name: Build and publish Docker image (Admin)
       #   uses: docker/build-push-action@v4
       #   with:
       #     file: packages/hoppscotch-sh-admin/Dockerfile
+      #     context: .
       #     push: true
-      #     tags: ghcr.io/wdaan/admin:${{ steps.fetch_tag.outputs.tag }}
+      #     tags: ghcr.io/wdaan/hoppscotch-admin:${{ steps.fetch_tag.outputs.tag }}
       
       # - name: Build and publish Docker image (Backend)
       #   uses: docker/build-push-action@v4
       #   with:
       #     file: packages/hoppscotch-backend/Dockerfile
+      #     context: .
       #     push: true
-      #     tags: ghcr.io/wdaan/app:${{ steps.fetch_tag.outputs.tag }}
-
+      #     tags: ghcr.io/wdaan/hoppscotch-backend:${{ steps.fetch_tag.outputs.tag }}
 
   # update-chart-versions:
   #   runs-on: ubuntu-latest

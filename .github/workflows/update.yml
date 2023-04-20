@@ -36,30 +36,30 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Build and publish Docker image (Backend)
+        uses: docker/build-push-action@v4
+        with:
+          file: packages/hoppscotch-backend/Dockerfile
+          context: .
+          target: prod
+          push: true
+          tags: ghcr.io/wdaan/hoppscotch-backend:${{ steps.fetch_tag.outputs.tag }}
+
       - name: Build and publish Docker image (App)
         uses: docker/build-push-action@v4
         with:
           file: packages/hoppscotch-selfhost-web/Dockerfile
           context: .
-          target: prod
           push: true
           tags: ghcr.io/wdaan/hoppscotch-app:${{ steps.fetch_tag.outputs.tag }}
       
-      # - name: Build and publish Docker image (Admin)
-      #   uses: docker/build-push-action@v4
-      #   with:
-      #     file: packages/hoppscotch-sh-admin/Dockerfile
-      #     context: .
-      #     push: true
-      #     tags: ghcr.io/wdaan/hoppscotch-admin:${{ steps.fetch_tag.outputs.tag }}
-      
-      # - name: Build and publish Docker image (Backend)
-      #   uses: docker/build-push-action@v4
-      #   with:
-      #     file: packages/hoppscotch-backend/Dockerfile
-      #     context: .
-      #     push: true
-      #     tags: ghcr.io/wdaan/hoppscotch-backend:${{ steps.fetch_tag.outputs.tag }}
+      - name: Build and publish Docker image (Admin)
+        uses: docker/build-push-action@v4
+        with:
+          file: packages/hoppscotch-sh-admin/Dockerfile
+          context: .
+          push: true
+          tags: ghcr.io/wdaan/hoppscotch-admin:${{ steps.fetch_tag.outputs.tag }}
 
   # update-chart-versions:
   #   runs-on: ubuntu-latest

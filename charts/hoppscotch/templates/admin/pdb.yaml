@@ -1,0 +1,20 @@
+{{- if (.Values.admin.pdb).enabled }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "admin.fullname" . }}
+  labels:
+    {{- include "hoppscotch.labels" (dict "context" . "component" .Values.admin.name "name" .Values.admin.name) | nindent 4 }}
+{{- if .Values.admin.pdb.annotations }}
+  annotations:
+  {{- range $key, $value := .Values.admin.service.annotations }}
+    {{ $key }}: {{ $value | quote }}
+  {{- end }}
+{{- end }}
+spec:
+  maxUnavailable: {{ default "25%" .Values.admin.pdb.maxUnavailable }} 
+  selector:
+    matchLabels:
+      {{- include "hoppscotch.selectorLabels" (dict "context" . "name" .Values.admin.name) | nindent 6 }}
+{{- end }}

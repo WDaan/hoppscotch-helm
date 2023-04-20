@@ -1,0 +1,837 @@
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+## Globally shared configuration
+global:
+
+  # -- Common labels for the all resources
+  additionalLabels: {}
+    # app: hoppscotch
+
+  # -- Number of old deployment ReplicaSets to retain. The rest will be garbage collected.
+  revisionHistoryLimit: 3
+  # -- Toggle and define pod-level security context.
+  # @default -- `{}` (See [values.yaml])
+  securityContext: {}
+  #  runAsUser: 999
+  #  runAsGroup: 999
+  #  fsGroup: 999
+  
+  serviceAccount:
+    # -- Create server service account
+    create: true
+    # -- Server service account name
+    name: hoppscotch-web 
+    # -- Annotations applied to created service account
+    annotations: {}
+    # -- Labels applied to created service account
+    labels: {}
+    # -- Automount API credentials for the Service Account
+    automountServiceAccountToken: true
+
+  # hoppscotch configuration settings
+  env:
+    # DATABASE_URL: postgresql://postgres:testpass@hoppscotch-db:5432/hoppscotch # or replace with your database URL 
+    # # Auth Tokens Config
+    # JWT_SECRET: "secretcode123"
+    # TOKEN_SALT_COMPLEXITY: 10
+    # MAGIC_LINK_TOKEN_VALIDITY:  3
+    # REFRESH_TOKEN_VALIDITY: "604800000" # Default validity is 7 days (604800000 ms) in ms
+    # ACCESS_TOKEN_VALIDITY: "86400000" # Default validity is 1 day (86400000 ms) in ms
+    # SESSION_SECRET: 'anothersecretcode123'
+    # # Hoppscotch App Domain Config
+    # REDIRECT_URL: "http://localhost:3000"
+    # WHITELISTED_ORIGINS :  "http://localhost:3170,http://localhost:3000,http://localhost:3100"
+    # # Google Auth Config
+    # GOOGLE_CLIENT_ID: "*****"
+    # GOOGLE_CLIENT_SECRET: "*****"
+    # GOOGLE_CALLBACK_URL: "http://localhost:3170/v1/auth/google/callback"
+    # GOOGLE_SCOPE: "email,profile"
+    # # Github Auth Config
+    # GITHUB_CLIENT_ID: "*****"
+    # GITHUB_CLIENT_SECRET: "*****"
+    # GITHUB_CALLBACK_URL: "http://localhost:3170/v1/auth/github/callback"
+    # GITHUB_SCOPE: "user:email"
+    # # Microsoft Auth Config
+    # MICROSOFT_CLIENT_ID: "*****"
+    # MICROSOFT_CLIENT_SECRET: "*****"
+    # MICROSOFT_CALLBACK_URL: "http://localhost:3170/v1/auth/microsoft/callback"
+    # MICROSOFT_SCOPE: "user.read"
+    # # Mailer config
+    # MAILER_SMTP_URL: "smtps://user@domain.com:pass@smtp.domain.com"
+    # MAILER_ADDRESS_FROM: '"From Name Here" <from@example.com>'
+    # Rate Limit Config
+    RATE_LIMIT_TTL: 60 # In seconds
+    RATE_LIMIT_MAX: 100 # Max requests per IP
+
+web:
+  # -- Web server name
+  name: web
+
+  # -- The number of server pods to run
+  replicas: 1
+
+  ## Hoppscotch web Horizontal Pod Autoscaler
+  autoscaling:
+    # -- Enable Horizontal Pod Autoscaler ([HPA]) for the Hoppscotch web
+    enabled: false
+    # -- Minimum number of replicas for the Hoppscotch web [HPA]
+    minReplicas: 1
+    # -- Maximum number of replicas for the Hoppscotch web [HPA]
+    maxReplicas: 5
+    # -- Average CPU utilization percentage for the Hoppscotch web [HPA]
+    targetCPUUtilizationPercentage: 50
+    # -- Average memory utilization percentage for the Hoppscotch web [HPA]
+    targetMemoryUtilizationPercentage: 50
+    # -- Configures the scaling behavior of the target in both Up and Down directions.
+    # This is only available on HPA apiVersion `autoscaling/v2beta2` and newer
+    behavior: {}
+      # scaleDown:
+      #  stabilizationWindowSeconds: 300
+      #  policies:
+      #   - type: Pods
+      #     value: 1
+      #     periodSeconds: 180
+      # scaleUp:
+      #   stabilizationWindowSeconds: 300
+      #   policies:
+      #   - type: Pods
+      #     value: 2
+      #     periodSeconds: 60
+
+  ## Hoppscotch web Pod Disruption Budget
+  ## Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+  pdb:
+    # -- Deploy a [PodDisruptionBudget] for the Hoppscotch web
+    enabled: false
+    # -- Labels to be added to Hoppscotch web pdb
+    labels: {}
+    # -- Annotations to be added to Hoppscotch web pdb
+    annotations: {}
+    # -- Number of pods that are available after eviction as number or percentage (eg.: 50%)
+    # @default -- `""` (defaults to 0 if not specified)
+    minAvailable: ""
+    # -- Number of pods that are unavailable after eviction as number or percentage (eg.: 50%).
+    ## Has higher precedence over `server.pdb.minAvailable`
+    maxUnavailable: ""
+
+  ## Hoppscotch web image
+  image:
+    # -- Repository to use for the Hoppscotch web
+    # @default -- `"ghcr.io/wdaan/hoppscotch-web"`
+    repository: "ghcr.io/wdaan/hoppscotch-web" # defaults to global.image.repository
+    # -- Tag to use for the Hoppscotch web
+    # @default -- `""` (defaults to global.image.tag)
+    tag: "" # defaults to global.image.tag
+    # -- Image pull policy for the Hoppscotch web
+    # @default -- `"IfNotPresent"`
+    imagePullPolicy: "IfNotPresent" # IfNotPresent
+
+  # -- Secrets with credentials to pull images from a private registry
+  # @default -- `[]` (defaults to global.imagePullSecrets)
+  imagePullSecrets: []
+
+  # -- Additional command line arguments to pass to Hoppscotch web
+  extraArgs: []
+
+  # -- Environment variables to pass to Hoppscotch web
+  env: []
+
+  # -- envFrom to pass to Hoppscotch web
+  # @default -- `[]` (See [values.yaml])
+  envFrom: []
+  # - configMapRef:
+  #     name: config-map-name
+  # - secretRef:
+  #     name: secret-name
+
+  # -- Specify postStart and preStop lifecycle hooks for your hoppscotch-web container
+  lifecycle: {}
+
+  # -- Annotations to be added to server Deployment
+  deploymentAnnotations: {}
+
+  # -- Annotations to be added to server pods
+  podAnnotations: {}
+
+  # -- Labels to be added to server pods
+  podLabels: {}
+
+  # -- Resource limits and requests for the Hoppscotch web
+  resources: {}
+  #  limits:
+  #    cpu: 100m
+  #    memory: 128Mi
+  #  requests:
+  #    cpu: 50m
+  #    memory: 64Mi
+
+  # Server container ports
+  containerPorts:
+    # -- Server container port
+    server: 8080
+
+  # -- Host Network for Server pods
+  hostNetwork: false
+
+  # -- [DNS configuration]
+  dnsConfig: {}
+  # -- Alternative DNS policy for Server pods
+  dnsPolicy: "ClusterFirst"
+
+  # -- Server container-level security context
+  # @default -- See [values.yaml]
+  containerSecurityContext:
+    runAsNonRoot: true
+    readOnlyRootFilesystem: true
+    allowPrivilegeEscalation: false
+    seccompProfile:
+      type: RuntimeDefault
+    capabilities:
+      drop:
+      - ALL
+
+  ## Readiness and liveness probes for default backend
+  ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/
+  readinessProbe:
+    # -- Minimum consecutive failures for the [probe] to be considered failed after having succeeded
+    failureThreshold: 3
+    # -- Number of seconds after the container has started before [probe] is initiated
+    initialDelaySeconds: 10
+    # -- How often (in seconds) to perform the [probe]
+    periodSeconds: 10
+    # -- Minimum consecutive successes for the [probe] to be considered successful after having failed
+    successThreshold: 1
+    # -- Number of seconds after which the [probe] times out
+    timeoutSeconds: 1
+
+  livenessProbe:
+    # -- Minimum consecutive failures for the [probe] to be considered failed after having succeeded
+    failureThreshold: 3
+    # -- Number of seconds after the container has started before [probe] is initiated
+    initialDelaySeconds: 10
+    # -- How often (in seconds) to perform the [probe]
+    periodSeconds: 10
+    # -- Minimum consecutive successes for the [probe] to be considered successful after having failed
+    successThreshold: 1
+    # -- Number of seconds after which the [probe] times out
+    timeoutSeconds: 1
+
+  # -- Priority class for the Hoppscotch web pods
+  # @default -- `""` (defaults to global.priorityClassName)
+  priorityClassName: ""
+
+  # -- [Node selector]
+  # @default -- `{}` (defaults to global.nodeSelector)
+  nodeSelector: {}
+
+  # -- [Tolerations] for use with node taints
+  # @default -- `[]` (defaults to global.tolerations)
+  tolerations: []
+
+  # -- Assign custom [affinity] rules to the deployment
+  # @default -- `{}` (defaults to global.affinity preset)
+  affinity: {}
+
+  # -- Assign custom [TopologySpreadConstraints] rules to the Hoppscotch web
+  # @default -- `[]` (defaults to global.topologySpreadConstraints)
+  ## Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
+  ## If labelSelector is left out, it will default to the labelSelector configuration of the deployment
+  topologySpreadConstraints: []
+    # - maxSkew: 1
+    #   topologyKey: topology.kubernetes.io/zone
+    #   whenUnsatisfiable: DoNotSchedule
+
+  # -- Deployment strategy to be added to the server Deployment
+  deploymentStrategy: {}
+    # type: RollingUpdate
+    # rollingUpdate:
+    #   maxSurge: 25%
+    #   maxUnavailable: 25%
+
+  ## Server service configuration
+  service:
+    # -- Server service annotations
+    annotations: {}
+    # -- Server service labels
+    labels: {}
+    # -- Server service type
+    type: ClusterIP
+    # -- Server service http port for NodePort service type (only if `server.service.type` is set to "NodePort")
+    nodePortHttp: 30080
+    # -- Server service https port for NodePort service type (only if `server.service.type` is set to "NodePort")
+    nodePortHttps: 30443
+    # -- Server service http port
+    servicePortHttp: 80
+    # -- Server service https port
+    servicePortHttps: 443
+    # -- Server service http port name, can be used to route traffic via istio
+    servicePortHttpName: http
+    # -- Server service https port name, can be used to route traffic via istio
+    servicePortHttpsName: https
+    # -- LoadBalancer will get created with the IP specified in this field
+    loadBalancerIP: ""
+    # -- Source IP ranges to allow access to service from
+    loadBalancerSourceRanges: []
+    # -- Server service external IPs
+    externalIPs: []
+    # -- Denotes if this Service desires to route external traffic to node-local or cluster-wide endpoints
+    externalTrafficPolicy: ""
+    # -- Used to maintain session affinity. Supports `ClientIP` and `None`
+    sessionAffinity: ""
+
+  ingress:
+    # -- Enable an ingress resource for the Hoppscotch web
+    enabled: false
+    # -- Additional ingress annotations
+    annotations: {}
+    # -- Additional ingress labels
+    labels: {}
+    # -- Defines which ingress controller will implement the resource
+    ingressClassName: ""
+
+    # -- List of ingress hosts
+    ## Hoppscotch Ingress.
+    ## Hostnames must be provided if Ingress is enabled.
+    ## Secrets must be manually created in the namespace
+    hosts: []
+      # - hoppscotch.example.com
+
+    # -- List of ingress paths
+    paths:
+      - /
+    # -- Ingress path type. One of `Exact`, `Prefix` or `ImplementationSpecific`
+    pathType: Prefix
+    # -- Additional ingress paths
+    extraPaths: []
+      # - path: /*
+      #   pathType: Prefix
+      #   backend:
+      #     service:
+      #       name: ssl-redirect
+      #       port:
+      #         name: use-annotation
+
+    # -- Ingress TLS configuration
+    tls: []
+      # - secretName: your-certificate-name
+      #   hosts:
+      #     - hoppscotch.example.com
+
+    # -- Uses `server.service.servicePortHttps` instead `server.service.servicePortHttp`
+    https: false
+
+admin:
+# -- admin server name
+  name: admin
+
+  # -- The number of server pods to run
+  replicas: 1
+
+  ## Hoppscotch web Horizontal Pod Autoscaler
+  autoscaling:
+    # -- Enable Horizontal Pod Autoscaler ([HPA]) for the Hoppscotch web
+    enabled: false
+    # -- Minimum number of replicas for the Hoppscotch web [HPA]
+    minReplicas: 1
+    # -- Maximum number of replicas for the Hoppscotch web [HPA]
+    maxReplicas: 5
+    # -- Average CPU utilization percentage for the Hoppscotch web [HPA]
+    targetCPUUtilizationPercentage: 50
+    # -- Average memory utilization percentage for the Hoppscotch web [HPA]
+    targetMemoryUtilizationPercentage: 50
+    # -- Configures the scaling behavior of the target in both Up and Down directions.
+    # This is only available on HPA apiVersion `autoscaling/v2beta2` and newer
+    behavior: {}
+      # scaleDown:
+      #  stabilizationWindowSeconds: 300
+      #  policies:
+      #   - type: Pods
+      #     value: 1
+      #     periodSeconds: 180
+      # scaleUp:
+      #   stabilizationWindowSeconds: 300
+      #   policies:
+      #   - type: Pods
+      #     value: 2
+      #     periodSeconds: 60
+
+  ## Hoppscotch web Pod Disruption Budget
+  ## Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+  pdb:
+    # -- Deploy a [PodDisruptionBudget] for the Hoppscotch web
+    enabled: false
+    # -- Labels to be added to Hoppscotch web pdb
+    labels: {}
+    # -- Annotations to be added to Hoppscotch web pdb
+    annotations: {}
+    # -- Number of pods that are available after eviction as number or percentage (eg.: 50%)
+    # @default -- `""` (defaults to 0 if not specified)
+    minAvailable: ""
+    # -- Number of pods that are unavailable after eviction as number or percentage (eg.: 50%).
+    ## Has higher precedence over `server.pdb.minAvailable`
+    maxUnavailable: ""
+
+  ## Hoppscotch web image
+  image:
+    # -- Repository to use for the Hoppscotch web
+    # @default -- `"ghcr.io/wdaan/hoppscotch-admin"`
+    repository: "ghcr.io/wdaan/hoppscotch-admin" # defaults to global.image.repository
+    # -- Tag to use for the Hoppscotch web
+    # @default -- `""` (defaults to global.image.tag)
+    tag: "" # defaults to global.image.tag
+    # -- Image pull policy for the Hoppscotch web
+    # @default -- `"IfNotPresent"`
+    imagePullPolicy: "IfNotPresent" # IfNotPresent
+
+  # -- Secrets with credentials to pull images from a private registry
+  # @default -- `[]` (defaults to global.imagePullSecrets)
+  imagePullSecrets: []
+
+  # -- Additional command line arguments to pass to Hoppscotch web
+  extraArgs: []
+
+  # -- Environment variables to pass to Hoppscotch web
+  env: []
+
+  # -- envFrom to pass to Hoppscotch web
+  # @default -- `[]` (See [values.yaml])
+  envFrom: []
+  # - configMapRef:
+  #     name: config-map-name
+  # - secretRef:
+  #     name: secret-name
+
+  # -- Specify postStart and preStop lifecycle hooks for your hoppscotch-web container
+  lifecycle: {}
+
+  # -- Annotations to be added to server Deployment
+  deploymentAnnotations: {}
+
+  # -- Annotations to be added to server pods
+  podAnnotations: {}
+
+  # -- Labels to be added to server pods
+  podLabels: {}
+
+  # -- Resource limits and requests for the Hoppscotch web
+  resources: {}
+  #  limits:
+  #    cpu: 100m
+  #    memory: 128Mi
+  #  requests:
+  #    cpu: 50m
+  #    memory: 64Mi
+
+  # Server container ports
+  containerPorts:
+    # -- Server container port
+    server: 8080
+
+  # -- Host Network for Server pods
+  hostNetwork: false
+
+  # -- [DNS configuration]
+  dnsConfig: {}
+  # -- Alternative DNS policy for Server pods
+  dnsPolicy: "ClusterFirst"
+
+  # -- Server container-level security context
+  # @default -- See [values.yaml]
+  containerSecurityContext:
+    runAsNonRoot: true
+    readOnlyRootFilesystem: true
+    allowPrivilegeEscalation: false
+    seccompProfile:
+      type: RuntimeDefault
+    capabilities:
+      drop:
+      - ALL
+
+  ## Readiness and liveness probes for default backend
+  ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/
+  readinessProbe:
+    # -- Minimum consecutive failures for the [probe] to be considered failed after having succeeded
+    failureThreshold: 3
+    # -- Number of seconds after the container has started before [probe] is initiated
+    initialDelaySeconds: 10
+    # -- How often (in seconds) to perform the [probe]
+    periodSeconds: 10
+    # -- Minimum consecutive successes for the [probe] to be considered successful after having failed
+    successThreshold: 1
+    # -- Number of seconds after which the [probe] times out
+    timeoutSeconds: 1
+
+  livenessProbe:
+    # -- Minimum consecutive failures for the [probe] to be considered failed after having succeeded
+    failureThreshold: 3
+    # -- Number of seconds after the container has started before [probe] is initiated
+    initialDelaySeconds: 10
+    # -- How often (in seconds) to perform the [probe]
+    periodSeconds: 10
+    # -- Minimum consecutive successes for the [probe] to be considered successful after having failed
+    successThreshold: 1
+    # -- Number of seconds after which the [probe] times out
+    timeoutSeconds: 1
+
+  # -- Priority class for the Hoppscotch web pods
+  # @default -- `""` (defaults to global.priorityClassName)
+  priorityClassName: ""
+
+  # -- [Node selector]
+  # @default -- `{}` (defaults to global.nodeSelector)
+  nodeSelector: {}
+
+  # -- [Tolerations] for use with node taints
+  # @default -- `[]` (defaults to global.tolerations)
+  tolerations: []
+
+  # -- Assign custom [affinity] rules to the deployment
+  # @default -- `{}` (defaults to global.affinity preset)
+  affinity: {}
+
+  # -- Assign custom [TopologySpreadConstraints] rules to the Hoppscotch web
+  # @default -- `[]` (defaults to global.topologySpreadConstraints)
+  ## Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
+  ## If labelSelector is left out, it will default to the labelSelector configuration of the deployment
+  topologySpreadConstraints: []
+    # - maxSkew: 1
+    #   topologyKey: topology.kubernetes.io/zone
+    #   whenUnsatisfiable: DoNotSchedule
+
+  # -- Deployment strategy to be added to the server Deployment
+  deploymentStrategy: {}
+    # type: RollingUpdate
+    # rollingUpdate:
+    #   maxSurge: 25%
+    #   maxUnavailable: 25%
+
+  ## Server service configuration
+  service:
+    # -- Server service annotations
+    annotations: {}
+    # -- Server service labels
+    labels: {}
+    # -- Server service type
+    type: ClusterIP
+    # -- Server service http port for NodePort service type (only if `server.service.type` is set to "NodePort")
+    nodePortHttp: 30080
+    # -- Server service https port for NodePort service type (only if `server.service.type` is set to "NodePort")
+    nodePortHttps: 30443
+    # -- Server service http port
+    servicePortHttp: 80
+    # -- Server service https port
+    servicePortHttps: 443
+    # -- Server service http port name, can be used to route traffic via istio
+    servicePortHttpName: http
+    # -- Server service https port name, can be used to route traffic via istio
+    servicePortHttpsName: https
+    # -- LoadBalancer will get created with the IP specified in this field
+    loadBalancerIP: ""
+    # -- Source IP ranges to allow access to service from
+    loadBalancerSourceRanges: []
+    # -- Server service external IPs
+    externalIPs: []
+    # -- Denotes if this Service desires to route external traffic to node-local or cluster-wide endpoints
+    externalTrafficPolicy: ""
+    # -- Used to maintain session affinity. Supports `ClientIP` and `None`
+    sessionAffinity: ""
+
+  ingress:
+    # -- Enable an ingress resource for the Hoppscotch web
+    enabled: false
+    # -- Additional ingress annotations
+    annotations: {}
+    # -- Additional ingress labels
+    labels: {}
+    # -- Defines which ingress controller will implement the resource
+    ingressClassName: ""
+
+    # -- List of ingress hosts
+    ## Hoppscotch Ingress.
+    ## Hostnames must be provided if Ingress is enabled.
+    ## Secrets must be manually created in the namespace
+    hosts: []
+      # - hoppscotch.example.com
+
+    # -- List of ingress paths
+    paths:
+      - /
+    # -- Ingress path type. One of `Exact`, `Prefix` or `ImplementationSpecific`
+    pathType: Prefix
+    # -- Additional ingress paths
+    extraPaths: []
+      # - path: /*
+      #   pathType: Prefix
+      #   backend:
+      #     service:
+      #       name: ssl-redirect
+      #       port:
+      #         name: use-annotation
+
+    # -- Ingress TLS configuration
+    tls: []
+      # - secretName: your-certificate-name
+      #   hosts:
+      #     - hoppscotch.example.com
+
+    # -- Uses `server.service.servicePortHttps` instead `server.service.servicePortHttp`
+    https: false
+
+backend:
+# -- backend server name
+  name: backend
+
+  # -- The number of server pods to run
+  replicas: 1
+
+  ## Hoppscotch web Horizontal Pod Autoscaler
+  autoscaling:
+    # -- Enable Horizontal Pod Autoscaler ([HPA]) for the Hoppscotch web
+    enabled: false
+    # -- Minimum number of replicas for the Hoppscotch web [HPA]
+    minReplicas: 1
+    # -- Maximum number of replicas for the Hoppscotch web [HPA]
+    maxReplicas: 5
+    # -- Average CPU utilization percentage for the Hoppscotch web [HPA]
+    targetCPUUtilizationPercentage: 50
+    # -- Average memory utilization percentage for the Hoppscotch web [HPA]
+    targetMemoryUtilizationPercentage: 50
+    # -- Configures the scaling behavior of the target in both Up and Down directions.
+    # This is only available on HPA apiVersion `autoscaling/v2beta2` and newer
+    behavior: {}
+      # scaleDown:
+      #  stabilizationWindowSeconds: 300
+      #  policies:
+      #   - type: Pods
+      #     value: 1
+      #     periodSeconds: 180
+      # scaleUp:
+      #   stabilizationWindowSeconds: 300
+      #   policies:
+      #   - type: Pods
+      #     value: 2
+      #     periodSeconds: 60
+
+  ## Hoppscotch web Pod Disruption Budget
+  ## Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+  pdb:
+    # -- Deploy a [PodDisruptionBudget] for the Hoppscotch web
+    enabled: false
+    # -- Labels to be added to Hoppscotch web pdb
+    labels: {}
+    # -- Annotations to be added to Hoppscotch web pdb
+    annotations: {}
+    # -- Number of pods that are available after eviction as number or percentage (eg.: 50%)
+    # @default -- `""` (defaults to 0 if not specified)
+    minAvailable: ""
+    # -- Number of pods that are unavailable after eviction as number or percentage (eg.: 50%).
+    ## Has higher precedence over `server.pdb.minAvailable`
+    maxUnavailable: ""
+
+  ## Hoppscotch web image
+  image:
+    # -- Repository to use for the Hoppscotch web
+    # @default -- `"ghcr.io/wdaan/hoppscotch-backend"`
+    repository: "ghcr.io/wdaan/hoppscotch-backend"
+    # -- Tag to use for the Hoppscotch web
+    # @default -- `""` (defaults to global.image.tag)
+    tag: "" # defaults to global.image.tag
+    # -- Image pull policy for the Hoppscotch web
+    # @default -- `"IfNotPresent"`
+    imagePullPolicy: "IfNotPresent" # IfNotPresent
+
+  # -- Secrets with credentials to pull images from a private registry
+  # @default -- `[]` (defaults to global.imagePullSecrets)
+  imagePullSecrets: []
+
+  # -- Additional command line arguments to pass to Hoppscotch web
+  extraArgs: []
+
+  # -- Environment variables to pass to Hoppscotch web
+  env: []
+
+  # -- envFrom to pass to Hoppscotch web
+  # @default -- `[]` (See [values.yaml])
+  envFrom: []
+  # - configMapRef:
+  #     name: config-map-name
+  # - secretRef:
+  #     name: secret-name
+
+  # -- Specify postStart and preStop lifecycle hooks for your hoppscotch-web container
+  lifecycle: {}
+
+  # -- Annotations to be added to server Deployment
+  deploymentAnnotations: {}
+
+  # -- Annotations to be added to server pods
+  podAnnotations: {}
+
+  # -- Labels to be added to server pods
+  podLabels: {}
+
+  # -- Resource limits and requests for the Hoppscotch web
+  resources: {}
+  #  limits:
+  #    cpu: 100m
+  #    memory: 128Mi
+  #  requests:
+  #    cpu: 50m
+  #    memory: 64Mi
+
+  # Server container ports
+  containerPorts:
+    # -- Server container port
+    server: 3170
+
+  # -- Host Network for Server pods
+  hostNetwork: false
+
+  # -- [DNS configuration]
+  dnsConfig: {}
+  # -- Alternative DNS policy for Server pods
+  dnsPolicy: "ClusterFirst"
+
+  # -- Server container-level security context
+  # @default -- See [values.yaml]
+  containerSecurityContext:
+    runAsNonRoot: true
+    readOnlyRootFilesystem: true
+    allowPrivilegeEscalation: false
+    seccompProfile:
+      type: RuntimeDefault
+    capabilities:
+      drop:
+      - ALL
+
+  ## Readiness and liveness probes for default backend
+  ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/
+  readinessProbe:
+    # -- Minimum consecutive failures for the [probe] to be considered failed after having succeeded
+    failureThreshold: 3
+    # -- Number of seconds after the container has started before [probe] is initiated
+    initialDelaySeconds: 10
+    # -- How often (in seconds) to perform the [probe]
+    periodSeconds: 10
+    # -- Minimum consecutive successes for the [probe] to be considered successful after having failed
+    successThreshold: 1
+    # -- Number of seconds after which the [probe] times out
+    timeoutSeconds: 1
+
+  livenessProbe:
+    # -- Minimum consecutive failures for the [probe] to be considered failed after having succeeded
+    failureThreshold: 3
+    # -- Number of seconds after the container has started before [probe] is initiated
+    initialDelaySeconds: 10
+    # -- How often (in seconds) to perform the [probe]
+    periodSeconds: 10
+    # -- Minimum consecutive successes for the [probe] to be considered successful after having failed
+    successThreshold: 1
+    # -- Number of seconds after which the [probe] times out
+    timeoutSeconds: 1
+
+  # -- Priority class for the Hoppscotch web pods
+  # @default -- `""` (defaults to global.priorityClassName)
+  priorityClassName: ""
+
+  # -- [Node selector]
+  # @default -- `{}` (defaults to global.nodeSelector)
+  nodeSelector: {}
+
+  # -- [Tolerations] for use with node taints
+  # @default -- `[]` (defaults to global.tolerations)
+  tolerations: []
+
+  # -- Assign custom [affinity] rules to the deployment
+  # @default -- `{}` (defaults to global.affinity preset)
+  affinity: {}
+
+  # -- Assign custom [TopologySpreadConstraints] rules to the Hoppscotch web
+  # @default -- `[]` (defaults to global.topologySpreadConstraints)
+  ## Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
+  ## If labelSelector is left out, it will default to the labelSelector configuration of the deployment
+  topologySpreadConstraints: []
+    # - maxSkew: 1
+    #   topologyKey: topology.kubernetes.io/zone
+    #   whenUnsatisfiable: DoNotSchedule
+
+  # -- Deployment strategy to be added to the server Deployment
+  deploymentStrategy: {}
+    # type: RollingUpdate
+    # rollingUpdate:
+    #   maxSurge: 25%
+    #   maxUnavailable: 25%
+
+  ## Server service configuration
+  service:
+    # -- Server service annotations
+    annotations: {}
+    # -- Server service labels
+    labels: {}
+    # -- Server service type
+    type: ClusterIP
+    # -- Server service http port for NodePort service type (only if `server.service.type` is set to "NodePort")
+    nodePortHttp: 30080
+    # -- Server service https port for NodePort service type (only if `server.service.type` is set to "NodePort")
+    nodePortHttps: 30443
+    # -- Server service http port
+    servicePortHttp: 80
+    # -- Server service https port
+    servicePortHttps: 443
+    # -- Server service http port name, can be used to route traffic via istio
+    servicePortHttpName: http
+    # -- Server service https port name, can be used to route traffic via istio
+    servicePortHttpsName: https
+    # -- LoadBalancer will get created with the IP specified in this field
+    loadBalancerIP: ""
+    # -- Source IP ranges to allow access to service from
+    loadBalancerSourceRanges: []
+    # -- Server service external IPs
+    externalIPs: []
+    # -- Denotes if this Service desires to route external traffic to node-local or cluster-wide endpoints
+    externalTrafficPolicy: ""
+    # -- Used to maintain session affinity. Supports `ClientIP` and `None`
+    sessionAffinity: ""
+
+  ingress:
+    # -- Enable an ingress resource for the Hoppscotch web
+    enabled: false
+    # -- Additional ingress annotations
+    annotations: {}
+    # -- Additional ingress labels
+    labels: {}
+    # -- Defines which ingress controller will implement the resource
+    ingressClassName: ""
+
+    # -- List of ingress hosts
+    ## Hoppscotch Ingress.
+    ## Hostnames must be provided if Ingress is enabled.
+    ## Secrets must be manually created in the namespace
+    hosts: []
+      # - hoppscotch.example.com
+
+    # -- List of ingress paths
+    paths:
+      - /
+    # -- Ingress path type. One of `Exact`, `Prefix` or `ImplementationSpecific`
+    pathType: Prefix
+    # -- Additional ingress paths
+    extraPaths: []
+      # - path: /*
+      #   pathType: Prefix
+      #   backend:
+      #     service:
+      #       name: ssl-redirect
+      #       port:
+      #         name: use-annotation
+
+    # -- Ingress TLS configuration
+    tls: []
+      # - secretName: your-certificate-name
+      #   hosts:
+      #     - hoppscotch.example.com
+
+    # -- Uses `server.service.servicePortHttps` instead `server.service.servicePortHttp`
+    https: false

@@ -11,13 +11,26 @@ global:
 
   # -- Number of old deployment ReplicaSets to retain. The rest will be garbage collected.
   revisionHistoryLimit: 3
-  # -- Toggle and define pod-level security context.
+  # -- Toggle and define global pod-level security context.
   # @default -- `{}` (See [values.yaml])
-  securityContext: {}
-  #  runAsUser: 999
-  #  runAsGroup: 999
-  #  fsGroup: 999
-  
+  podSecurityContext:
+    runAsNonRoot: true
+    readOnlyRootFilesystem: true
+    allowPrivilegeEscalation: false
+    runAsUser: 15000
+    runAsGroup: 15000
+    capabilities:
+      drop:
+      - ALL
+  # -- Toggle and define global container-level security context.
+  # @default -- `{}` (See [values.yaml])
+  containerSecurityContext:
+    runAsUser: 15000
+    runAsGroup: 15000
+    fsGroup: 15000
+    seccompProfile:
+      type: RuntimeDefault
+
   serviceAccount:
     # -- Create server service account
     create: true
@@ -136,7 +149,7 @@ web:
   extraArgs: []
 
   # -- Environment variables to pass to Hoppscotch web
-  env: []
+  env: {}
 
   # -- envFrom to pass to Hoppscotch web
   # @default -- `[]` (See [values.yaml])
@@ -180,17 +193,13 @@ web:
   # -- Alternative DNS policy for Server pods
   dnsPolicy: "ClusterFirst"
 
+  # -- Toggle and define pod-level security context.
+  # @default -- `{}` (See [values.yaml])
+  podSecurityContext: {}
+
   # -- Server container-level security context
   # @default -- See [values.yaml]
-  containerSecurityContext:
-    runAsNonRoot: true
-    readOnlyRootFilesystem: true
-    allowPrivilegeEscalation: false
-    seccompProfile:
-      type: RuntimeDefault
-    capabilities:
-      drop:
-      - ALL
+  containerSecurityContext: {}
 
   ## Readiness and liveness probes for default backend
   ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/
@@ -393,7 +402,7 @@ admin:
   extraArgs: []
 
   # -- Environment variables to pass to Hoppscotch web
-  env: []
+  env: {}
 
   # -- envFrom to pass to Hoppscotch web
   # @default -- `[]` (See [values.yaml])
@@ -437,17 +446,13 @@ admin:
   # -- Alternative DNS policy for Server pods
   dnsPolicy: "ClusterFirst"
 
+  # -- Toggle and define pod-level security context.
+  # @default -- `{}` (See [values.yaml])
+  podSecurityContext: {}
+
   # -- Server container-level security context
   # @default -- See [values.yaml]
-  containerSecurityContext:
-    runAsNonRoot: true
-    readOnlyRootFilesystem: true
-    allowPrivilegeEscalation: false
-    seccompProfile:
-      type: RuntimeDefault
-    capabilities:
-      drop:
-      - ALL
+  containerSecurityContext: {}
 
   ## Readiness and liveness probes for default backend
   ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/
@@ -650,7 +655,7 @@ backend:
   extraArgs: []
 
   # -- Environment variables to pass to Hoppscotch web
-  env: []
+  env: {}
 
   # -- envFrom to pass to Hoppscotch web
   # @default -- `[]` (See [values.yaml])
@@ -694,17 +699,13 @@ backend:
   # -- Alternative DNS policy for Server pods
   dnsPolicy: "ClusterFirst"
 
+  # -- Toggle and define pod-level security context.
+  # @default -- `{}` (See [values.yaml])
+  podSecurityContext: {}
+
   # -- Server container-level security context
   # @default -- See [values.yaml]
-  containerSecurityContext:
-    runAsNonRoot: true
-    readOnlyRootFilesystem: true
-    allowPrivilegeEscalation: false
-    seccompProfile:
-      type: RuntimeDefault
-    capabilities:
-      drop:
-      - ALL
+  containerSecurityContext: {}
 
   ## Readiness and liveness probes for default backend
   ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/

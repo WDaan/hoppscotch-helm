@@ -33,13 +33,15 @@ spec:
       {{- end }}
       serviceAccountName: {{ include "hoppscotch.serviceAccountName" . }}
       securityContext:
-        {{- toYaml .Values.global.securityContext | nindent 8 }}
+        {{- toYaml (merge .Values.global.containerSecurityContext .Values.web.containerSecurityContext) | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
-            {{- toYaml .Values.web.securityContext | nindent 12 }}
+            {{- toYaml (merge .Values.global.podSecurityContext .Values.web.podSecurityContext) | nindent 12 }}
           image: "{{ .Values.web.image.repository }}:{{ .Values.web.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.web.image.imagePullPolicy }}
+          env:
+            {{- (include "hoppscotch.env_vars" (deepCopy .Values.web.env | merge .Values.global.env)) | nindent 12 }}
           ports:
             - name: http
               containerPort: {{ .Values.web.containerPorts.server }}

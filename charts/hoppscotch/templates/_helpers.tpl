@@ -100,9 +100,7 @@ Pod annotations
   {{- with . -}}
     {{- $result := list -}}
     {{- range $name, $value := . -}}
-        {{- if kindIs "string" $value -}}
-          {{- $result = append $result (dict "name" $name "value" (tpl $value $)) -}}
-        {{- else if or (kindIs "float64" $value) (kindIs "bool" $value) -}}
+        {{- if or (kindIs "float64" $value) (kindIs "bool" $value) -}}
           {{- $result = append $result (dict "name" $name "value" ($value | toString)) -}}
         {{- else -}}
           {{- $result = append $result (dict "name" $name "value" $value) -}}

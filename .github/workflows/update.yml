@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: hoppscotch/hoppscotch
           ref: main
@@ -67,7 +67,7 @@ jobs:
     needs: [build-and-push-containers]
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Fetch Latest Release Tag
         id: fetch_tag
